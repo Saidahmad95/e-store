@@ -2,16 +2,18 @@ package com.example.estore.entities;
 
 import com.example.estore.entities.common.AbstractEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product extends AbstractEntity {
     private String name;
 

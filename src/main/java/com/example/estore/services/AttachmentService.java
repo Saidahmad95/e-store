@@ -28,9 +28,8 @@ public class AttachmentService {
                 .fileSize(file.getSize())
                 .build();
         Attachment savedAttachment = attachmentRepo.save(builtAttachment);
-        String filePath = FOLDER_PATH;
         byte[] bytes = file.getBytes();
-        Path path = Paths.get(filePath + file.getOriginalFilename());
+        Path path = Paths.get(FOLDER_PATH + file.getOriginalFilename());
         Path writtenPath = Files.write(path, bytes);
         HashMap<Attachment, Path> attachmentAndPath = new HashMap<>();
         attachmentAndPath.put(savedAttachment,writtenPath);
