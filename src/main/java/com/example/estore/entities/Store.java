@@ -5,14 +5,14 @@ import com.example.estore.entities.common.AbstractEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Table;
+import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Data
+@Table
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Store extends AbstractEntity {
@@ -22,4 +22,8 @@ public class Store extends AbstractEntity {
     @OneToOne(fetch = FetchType.LAZY)
     private Attachment attachment;
 
+
+    public Store(String name) {
+        this.name = name;
+    }
 }
