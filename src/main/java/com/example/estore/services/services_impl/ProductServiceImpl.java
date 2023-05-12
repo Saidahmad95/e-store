@@ -4,23 +4,23 @@ import com.example.estore.entities.Category;
 import com.example.estore.entities.Product;
 import com.example.estore.entities.Store;
 import com.example.estore.payload.ApiResponse;
-import com.example.estore.payload.ProductCreationReq;
+import com.example.estore.payload.ProductReq;
 import com.example.estore.repos.CategoryRepo;
 import com.example.estore.repos.ProductRepo;
-import com.example.estore.repos.StoreRepo;
 import com.example.estore.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.estore.enums.ApiResponseMessages.*;
 import static com.example.estore.util.CustomValidation.*;
 import static com.example.estore.util.Mapper.responseEntityMaker;
+import static com.example.estore.util.Mapper.updateProduct;
 import static java.util.UUID.*;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +28,14 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
-    private final StoreRepo storeRepo;
+    private final StoreServiceImpl storeServiceImpl;
 
     @Override
-    public ResponseEntity<ApiResponse> addProduct(ProductCreationReq request) {
-        Optional<Category> categoryById = checkCategoryById(request);
-        Optional<Store> storeById = checkStoreById(request);
+    public ResponseEntity<ApiResponse> addProduct(ProductReq request) {
+        //TODO Should change after creation category implementations
+//        Optional<Category> categoryById = checkCategoryById(request.getCategoryId());
+        Optional<Category> categoryById = Optional.of(new Category());
+        Optional<Store> storeById = storeServiceImpl.checkStoreById(request.getStoreId());
 
         if (categoryById.isPresent() && storeById.isPresent()) {
             Product builtProduct = buildProduct(request, categoryById, storeById);
@@ -44,19 +46,60 @@ public class ProductServiceImpl implements ProductService {
         return buildApiResponseInFail(categoryById, storeById);
     }
 
+    @Override
+    public ResponseEntity<ApiResponse> editProduct(ProductReq request, String id) {
+        Optional<Product> productById = checkProductById(id);
+        if (productById.isPresent()) {
+            Product foundProduct = productById.get();
+            //TODO Change after Category implementation
+//            Optional<Category> categoryById = checkCategoryById(request.getCategoryId());
+            Optional<Category> categoryById = Optional.of(new Category());
+            Optional<Store> storeById = storeServiceImpl.checkStoreById(request.getStoreId());
 
-    private Optional<Store> checkStoreById(ProductCreationReq request) {
-        return validateUUID(request.getStoreId())
-                ? storeRepo.findById(fromString(request.getStoreId())) : Optional.empty();
+            if (categoryById.isPresent() && storeById.isPresent()) {
+                Product updatedProduct = updateProduct(
+                        foundProduct,
+                        request,
+                        storeById.get(),
+                        categoryById.get());
+
+                Product savedProduct = productRepo.save(updatedProduct);
+                return responseEntityMaker(OK, PRODUCT_EDITED.getMessage(), savedProduct);
+            }
+            return buildApiResponseInFail(categoryById, storeById);
+        }
+        return responseEntityMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage(), null);
     }
 
-    private Optional<Category> checkCategoryById(ProductCreationReq request) {
-        return validateUUID(request.getCategoryId())
-                ? categoryRepo.findById(fromString(request.getCategoryId())) : Optional.empty();
+    @Override
+    public ResponseEntity<ApiResponse> deleteProduct(String uuid) {
+        if (checkProductById(uuid).isPresent()) {
+            productRepo.deleteById(fromString(uuid));
+            return responseEntityMaker(OK, PRODUCT_DELETED.getMessage(), null);
+        }
+        return responseEntityMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage(), null);
     }
 
+    @Override
+    public ResponseEntity<ApiResponse> getAllProducts() {
+        List<Product> products = productRepo.findAll();
+        return responseEntityMaker(OK,
+                products.isEmpty() ? NO_PRODUCTS.getMessage() : TOTAL_PRODUCTS.getMessage() + products.size(),
+                products);
+    }
 
-    private Product buildProduct(ProductCreationReq request,
+    //TODO Should move to CategoryService
+    private Optional<Category> checkCategoryById(String uuid) {
+        return validateUUID(uuid)
+                ? categoryRepo.findById(fromString(uuid)) : Optional.empty();
+    }
+
+    private Optional<Product> checkProductById(String uuid) {
+        return validateUUID(uuid)
+                ? productRepo.findById(fromString(uuid)) : Optional.empty();
+    }
+
+    private Product buildProduct(ProductReq request,
                                  Optional<Category> categoryById,
                                  Optional<Store> storeById) {
         return Product.builder()

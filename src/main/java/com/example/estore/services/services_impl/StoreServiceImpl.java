@@ -16,12 +16,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.estore.enums.ApiResponseMessages.*;
 import static com.example.estore.util.CustomValidation.validateUUID;
 import static com.example.estore.util.Mapper.apiResponseMaker;
 import static com.example.estore.util.Mapper.responseEntityMaker;
+import static java.util.UUID.fromString;
 import static org.springframework.http.HttpStatus.*;
 
 @Service
@@ -72,4 +74,11 @@ public class StoreServiceImpl implements StoreService {
                 storeList.isEmpty() ? NO_STORES.getMessage() :TOTAL_STORES.getMessage()+storeList.size(),
                 storeList);
     }
+
+    public  Optional<Store> checkStoreById(String  uuid) {
+        return validateUUID(uuid)
+                ? storeRepo.findById(fromString(uuid)) : Optional.empty();
+    }
+
+
 }

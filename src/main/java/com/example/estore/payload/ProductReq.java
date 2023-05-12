@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class ProductCreationReq {
+public class ProductReq {
     private String name;
     private Integer stock;
     private String storeId;
