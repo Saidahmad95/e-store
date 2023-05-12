@@ -73,8 +73,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<ApiResponse> deleteProduct(String uuid) {
-        if (checkProductById(uuid).isPresent()) {
-            productRepo.deleteById(fromString(uuid));
+        Optional<Product> productById = checkProductById(uuid);
+        if (productById.isPresent()) {
+//            productRepo.deleteById(fromString(uuid));
+            Product foundProduct = productById.get();
+            foundProduct.setDeleted(true);
+            productRepo.save(foundProduct);
             return responseEntityMaker(OK, PRODUCT_DELETED.getMessage(), null);
         }
         return responseEntityMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage(), null);
@@ -82,7 +86,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<ApiResponse> getAllProducts() {
-        List<Product> products = productRepo.findAll();
+        List<Product> products = productRepo.findAll()
+                .stream()
+                .filter(product -> !product.isDeleted())
+                .toList();
+
         return responseEntityMaker(OK,
                 products.isEmpty() ? NO_PRODUCTS.getMessage() : TOTAL_PRODUCTS.getMessage() + products.size(),
                 products);
@@ -94,7 +102,7 @@ public class ProductServiceImpl implements ProductService {
                 ? categoryRepo.findById(fromString(uuid)) : Optional.empty();
     }
 
-    private Optional<Product> checkProductById(String uuid) {
+    public Optional<Product> checkProductById(String uuid) {
         return validateUUID(uuid)
                 ? productRepo.findById(fromString(uuid)) : Optional.empty();
     }

@@ -2,7 +2,7 @@ package com.example.estore.controllers;
 
 
 import com.example.estore.payload.ApiResponse;
-import com.example.estore.payload.StoreCreationReq;
+import com.example.estore.payload.StoreReq;
 import com.example.estore.services.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping("/createStore")
-    public ResponseEntity<ApiResponse> createStore(@RequestBody StoreCreationReq request) {
+    public ResponseEntity<ApiResponse> createStore(@RequestBody StoreReq request) {
         return storeService.createStore(request);
     }
 
@@ -31,7 +31,7 @@ public class StoreController {
 
     @PutMapping("editStore/{id}")
     public ResponseEntity<ApiResponse> editStore(@PathVariable String id,
-                                                 @RequestBody StoreCreationReq request ){
+                                                 @RequestBody StoreReq request ){
         return storeService.editStore(id,request);
     }
 

@@ -6,7 +6,7 @@ public enum ApiResponseMessages {
 
 
     // STORE
-    STORE_CREATED("Store is successfully created !"),
+    STORE_CREATED("Store successfully created !"),
     STORE_NOT_FOUND("Store not found !"),
     NO_STORES("No stores available !"),
     TOTAL_STORES("Total store(s): "),
@@ -14,8 +14,8 @@ public enum ApiResponseMessages {
 
 
     // PRODUCT
-    PRODUCT_ADDED("Product is successfully added !"),
-    PRODUCT_EDITED("Product is successfully edited !"),
+    PRODUCT_ADDED("Product successfully added !"),
+    PRODUCT_EDITED("Product successfully edited !"),
     PRODUCT_NOT_FOUND("Product not found !"),
     PRODUCT_DELETED("Product successfully deleted !"),
     NO_PRODUCTS("No products available !"),
@@ -23,7 +23,17 @@ public enum ApiResponseMessages {
 
 
     // CATEGORY
-    CATEGORY_NOT_FOUND("Category not found !");
+    CATEGORY_NOT_FOUND("Category not found !"),
+
+
+
+    // ADDON
+    ADDON_ADDED("Addon successfully added !"),
+    ADDON_NOT_FOUND("Addon not found !"),
+    ADDON_DELETED("Addon successfully deleted!"),
+    TOTAL_ADDONS("Total addon(s): "),
+
+    NO_ADDONS("No addons available !");
 
     private String message;
 

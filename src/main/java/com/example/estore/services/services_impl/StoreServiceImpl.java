@@ -3,7 +3,7 @@ package com.example.estore.services.services_impl;
 import com.example.estore.entities.Attachment;
 import com.example.estore.entities.Store;
 import com.example.estore.payload.ApiResponse;
-import com.example.estore.payload.StoreCreationReq;
+import com.example.estore.payload.StoreReq;
 import com.example.estore.repos.StoreRepo;
 import com.example.estore.services.AttachmentService;
 import com.example.estore.services.StoreService;
@@ -34,7 +34,7 @@ public class StoreServiceImpl implements StoreService {
     private final AttachmentService attachmentService;
 
 
-    public ResponseEntity<ApiResponse> createStore(StoreCreationReq request) {
+    public ResponseEntity<ApiResponse> createStore(StoreReq request) {
         Store newStore = new Store(request.getName());
         Store savedStore = storeRepo.save(newStore);
 
@@ -57,7 +57,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> editStore(String id, StoreCreationReq request) {
+    public ResponseEntity<ApiResponse> editStore(String id, StoreReq request) {
         Store foundStore = validateUUID(id) ? storeRepo.findById(UUID.fromString(id)).orElse(null) : null;
         if (foundStore!=null){
             foundStore.setName(request.getName());

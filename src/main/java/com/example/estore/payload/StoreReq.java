@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StoreCreationReq {
+public class StoreReq {
 
     private String name;
 }
