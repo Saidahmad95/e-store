@@ -9,4 +9,8 @@ public interface OrderService {
     ResponseEntity<ApiResponse> addOrder(OrderReq request);
 
     ResponseEntity<ApiResponse> addOrderData(OrderDataReq request);
+
+    ResponseEntity<ApiResponse> getAllOrders();
+
+    ResponseEntity<ApiResponse> getAllOrderData();
 }

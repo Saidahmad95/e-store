@@ -13,14 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.estore.enums.ApiResponseMessages.*;
 import static com.example.estore.util.CustomValidation.validateUUID;
 import static com.example.estore.util.Mapper.responseEntityMaker;
 import static java.util.UUID.fromString;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -67,6 +67,35 @@ public class OrderServiceImpl implements OrderService {
         return responseEntityMaker(CREATED, ORDER_DATA_ADDED.getMessage(), savedOrderData);
     }
 
+    @Override
+    public ResponseEntity<ApiResponse> getAllOrders() {
+        List<Order> orderList = orderRepo.findAll()
+                .stream()
+                .filter(order -> !order.isDeleted())
+                .toList();
+
+        return responseEntityMaker(OK,
+                orderList.isEmpty() ? NO_ORDERS.getMessage() : TOTAL_ORDERS.getMessage() + orderList.size(),
+                orderList);
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse> getAllOrderData() {
+        List<OrderData> orderDataList = orderDataRepo.findAll()
+                .stream()
+                .filter(orderData -> !orderData.isDeleted())
+                .toList();
+
+        return responseEntityMaker(OK,
+                orderDataList.isEmpty() ? NO_ORDER_DATA.getMessage() : TOTAL_ORDER_DATA.getMessage() + orderDataList.size(),
+                orderDataList);
+    }
+
+
+    public Optional<Order> findOrder(String orderUuid) {
+        return validateUUID(orderUuid) ? orderRepo.findById(fromString(orderUuid)) : Optional.empty();
+    }
+
     private static OrderData buildOrderData(OrderDataReq request, Optional<Order> orderOptional, Optional<Product> productById, Optional<Addon> addonById) {
         return OrderData.builder()
                 .order(orderOptional.get())
@@ -77,11 +106,6 @@ public class OrderServiceImpl implements OrderService {
                 .totalPrice(request.getTotalPrice())
                 .build();
     }
-
-    public Optional<Order> findOrder(String orderUuid) {
-        return validateUUID(orderUuid) ? orderRepo.findById(fromString(orderUuid)) : Optional.empty();
-    }
-
 
     private static Order buildOrder(OrderReq request, Optional<Store> storeById, PayType payType) {
         return Order.builder()
@@ -97,3 +121,4 @@ public class OrderServiceImpl implements OrderService {
                 .findAny().orElse(null);
     }
 }
+

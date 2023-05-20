@@ -6,13 +6,8 @@ import com.example.estore.payload.OrderReq;
 import com.example.estore.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-//order/addOrder
-//data/addOrderData
 @RestController
 @RequestMapping("/order")
 @RequiredArgsConstructor
@@ -29,6 +24,16 @@ public class OrderController {
     @PostMapping("/addOrderData")
     public ResponseEntity<ApiResponse> addOrderData(@RequestBody OrderDataReq request) {
         return orderService.addOrderData(request);
+    }
+
+    @GetMapping("/view-all-orders")
+    public ResponseEntity<ApiResponse> getAllOrders() {
+        return orderService.getAllOrders();
+    }
+
+    @GetMapping("/view-all-order-data")
+    public ResponseEntity<ApiResponse> getAllOrderData() {
+        return orderService.getAllOrderData();
     }
 
 

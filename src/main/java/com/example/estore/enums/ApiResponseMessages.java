@@ -39,10 +39,13 @@ public enum ApiResponseMessages {
     // ORDER
     ORDER_ADDED("Order successfully added !"),
     ORDER_NOT_FOUND("Order not found !"),
-
+    NO_ORDERS("No orders available !"),
+    TOTAL_ORDERS("Total order(s): "),
 
     // ORDER_DATA
     ORDER_DATA_ADDED("Order-data successfully added !"),
+    NO_ORDER_DATA("No order-data available !"),
+    TOTAL_ORDER_DATA("Total order-data(s): "),
 
 
     // PayType
