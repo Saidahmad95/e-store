@@ -102,9 +102,9 @@ public class ProductServiceImpl implements ProductService {
                 ? categoryRepo.findById(fromString(uuid)) : Optional.empty();
     }
 
-    public Optional<Product> checkProductById(String uuid) {
-        return validateUUID(uuid)
-                ? productRepo.findById(fromString(uuid)) : Optional.empty();
+    public Optional<Product> checkProductById(String productUuid) {
+        return validateUUID(productUuid)
+                ? productRepo.findById(fromString(productUuid)) : Optional.empty();
     }
 
     private Product buildProduct(ProductReq request,

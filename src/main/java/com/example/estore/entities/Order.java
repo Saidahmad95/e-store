@@ -4,15 +4,19 @@ package com.example.estore.entities;
 import com.example.estore.entities.common.AbstractEntity;
 import com.example.estore.enums.PayType;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name ="orders" )
+@Table(name = "orders")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

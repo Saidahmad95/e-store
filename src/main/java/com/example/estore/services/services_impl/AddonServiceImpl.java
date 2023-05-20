@@ -72,8 +72,8 @@ public class AddonServiceImpl implements AddonService {
                 .build();
     }
 
-    public Optional<Addon> checkAddonById(String uuid) {
-        return validateUUID(uuid)
-                ? addonRepo.findById(fromString(uuid)) : Optional.empty();
+    public Optional<Addon> checkAddonById(String addonUuid) {
+        return validateUUID(addonUuid)
+                ? addonRepo.findById(fromString(addonUuid)) : Optional.empty();
     }
 }

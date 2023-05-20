@@ -32,8 +32,23 @@ public enum ApiResponseMessages {
     ADDON_NOT_FOUND("Addon not found !"),
     ADDON_DELETED("Addon successfully deleted!"),
     TOTAL_ADDONS("Total addon(s): "),
+    NO_ADDONS("No addons available !"),
 
-    NO_ADDONS("No addons available !");
+
+
+    // ORDER
+    ORDER_ADDED("Order successfully added !"),
+    ORDER_NOT_FOUND("Order not found !"),
+
+
+    // ORDER_DATA
+    ORDER_DATA_ADDED("Order-data successfully added !"),
+
+
+    // PayType
+    PAY_TYPE_NOT_FOUND("Pay-types not found !");
+
+
 
     private String message;
 
