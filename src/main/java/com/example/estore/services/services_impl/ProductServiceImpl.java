@@ -97,10 +97,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     //TODO Should move to CategoryService
-    private Optional<Category> checkCategoryById(String uuid) {
-        return validateUUID(uuid)
-                ? categoryRepo.findById(fromString(uuid)) : Optional.empty();
-    }
+
 
     public Optional<Product> checkProductById(String productUuid) {
         return validateUUID(productUuid)

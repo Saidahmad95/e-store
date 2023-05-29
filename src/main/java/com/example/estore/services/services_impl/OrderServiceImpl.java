@@ -12,12 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static com.example.estore.enums.ApiResponseMessages.*;
 import static com.example.estore.util.CustomValidation.validateUUID;
+import static com.example.estore.util.Mapper.apiResponseMaker;
 import static com.example.estore.util.Mapper.responseEntityMaker;
 import static java.util.UUID.fromString;
 import static org.springframework.http.HttpStatus.*;
@@ -33,38 +35,58 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDataRepo orderDataRepo;
 
     @Override
-    public ResponseEntity<ApiResponse> addOrder(OrderReq request) {
+    public ResponseEntity<?> addOrder(OrderReq request) {
+        List<ApiResponse> failureResponses = new ArrayList<>();
+
         Optional<Store> storeById = storeServiceImpl.checkStoreById(request.getStoreId());
         if (storeById.isEmpty())
-            return responseEntityMaker(NOT_FOUND, STORE_NOT_FOUND.getMessage(), null);
-
+            failureResponses.add(apiResponseMaker(NOT_FOUND, STORE_NOT_FOUND.getMessage(), null));
 
         PayType payType = findPayType(request.getPayType());
         if (payType == null)
-            return responseEntityMaker(NOT_FOUND, STORE_NOT_FOUND.getMessage(), null);
+            failureResponses.add(apiResponseMaker(NOT_FOUND, PAY_TYPE_NOT_FOUND.getMessage(), null));
 
+        if (!failureResponses.isEmpty()) {
+            return ResponseEntity.status(BAD_REQUEST).body(Optional.of(failureResponses));
+        }
         Order savedOrder = orderRepo.save(buildOrder(request, storeById, payType));
         return responseEntityMaker(CREATED, ORDER_ADDED.getMessage(), savedOrder);
+
     }
 
     @Override
     public ResponseEntity<ApiResponse> addOrderData(OrderDataReq request) {
+
+
         Optional<Order> orderOptional = findOrder(request.getOrderId());
-        if (orderOptional.isEmpty())
-            return responseEntityMaker(NOT_FOUND, ORDER_NOT_FOUND.getMessage(), null);
-
         Optional<Product> productById = productServiceImpl.checkProductById(request.getProductId());
-        if (productById.isEmpty())
-            return responseEntityMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage(), null);
-
         Optional<Addon> addonById = addonServiceImpl.checkAddonById(request.getAddonId());
-        if (addonById.isEmpty())
-            return responseEntityMaker(NOT_FOUND, ADDON_NOT_FOUND.getMessage(), null);
 
+        List<ApiResponse> responses = collectFailedResponses(orderOptional, productById, addonById);
+        if (!responses.isEmpty()) {
+//         ResponseEntity.status(BAD_REQUEST).body(Optional.of(responses));
+            return responseEntityMaker(BAD_REQUEST, WENT_WRONG.getMessage(), responses);
+        }
         OrderData savedOrderData = orderDataRepo.save(
                 buildOrderData(request, orderOptional, productById, addonById));
 
         return responseEntityMaker(CREATED, ORDER_DATA_ADDED.getMessage(), savedOrderData);
+    }
+
+    private static List<ApiResponse> collectFailedResponses(Optional<Order> orderOptional,
+                                                            Optional<Product> productById,
+                                                            Optional<Addon> addonById) {
+        List<ApiResponse> failureResponses = new ArrayList<>();
+        if (orderOptional.isEmpty()) {
+            failureResponses.add(apiResponseMaker(NOT_FOUND, ORDER_NOT_FOUND.getMessage(), null));
+        }
+        if (productById.isEmpty()) {
+            failureResponses.add(apiResponseMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage(), null));
+        }
+        if (addonById.isEmpty())
+            failureResponses.add(apiResponseMaker(NOT_FOUND, ADDON_NOT_FOUND.getMessage(), null));
+
+        return failureResponses;
     }
 
     @Override

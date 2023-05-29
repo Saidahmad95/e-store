@@ -6,7 +6,7 @@ import com.example.estore.payload.OrderReq;
 import org.springframework.http.ResponseEntity;
 
 public interface OrderService {
-    ResponseEntity<ApiResponse> addOrder(OrderReq request);
+    ResponseEntity<?> addOrder(OrderReq request);
 
     ResponseEntity<ApiResponse> addOrderData(OrderDataReq request);
 

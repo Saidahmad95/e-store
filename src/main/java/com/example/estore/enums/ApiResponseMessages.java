@@ -1,6 +1,9 @@
 package com.example.estore.enums;
 
 public enum ApiResponseMessages {
+    WENT_WRONG("Something went wrong !"),
+
+
     //ATACHMENT
     ATTACHMENT_UPLOAD("Attachment is successfully uploaded !"),
 
@@ -24,7 +27,9 @@ public enum ApiResponseMessages {
 
     // CATEGORY
     CATEGORY_NOT_FOUND("Category not found !"),
-
+    CATEGORY_ADDED("Category successfully added !"),
+    CATEGORY_EDITED("Category successfully edited !"),
+    CATEGORY_DELETED("Category successfully deleted !"),
 
 
     // ADDON
@@ -33,7 +38,6 @@ public enum ApiResponseMessages {
     ADDON_DELETED("Addon successfully deleted!"),
     TOTAL_ADDONS("Total addon(s): "),
     NO_ADDONS("No addons available !"),
-
 
 
     // ORDER
@@ -50,7 +54,6 @@ public enum ApiResponseMessages {
 
     // PayType
     PAY_TYPE_NOT_FOUND("Pay-types not found !");
-
 
 
     private String message;

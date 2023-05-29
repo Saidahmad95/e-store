@@ -3,6 +3,7 @@ package com.example.estore.entities;
 
 import com.example.estore.entities.common.AbstractEntity;
 import com.example.estore.enums.PayType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
