@@ -30,14 +30,14 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepo categoryRepo;
 
     @Override
-    public ResponseEntity<?> addCategory(CategoryReq request) {
+    public ResponseEntity<ApiResponse> addCategory(CategoryReq request) {
         Category builtCategory = Category.builder().name(request.getCategoryName()).build();
         Category savedCategory = categoryRepo.save(builtCategory);
         return responseEntityMaker(CREATED, CATEGORY_ADDED.getMessage(), savedCategory);
     }
 
     @Override
-    public ResponseEntity<?> editCategory(String id, CategoryReq request) {
+    public ResponseEntity<ApiResponse> editCategory(String id, CategoryReq request) {
         Optional<Category> categoryById = checkCategoryById(id);
         if (categoryById.isPresent()) {
             Category foundCategory = categoryById.get();

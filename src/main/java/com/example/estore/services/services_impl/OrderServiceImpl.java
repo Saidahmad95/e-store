@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDataRepo orderDataRepo;
 
     @Override
-    public ResponseEntity<?> addOrder(OrderReq request) {
+    public ResponseEntity<ApiResponse> addOrder(OrderReq request) {
         List<ApiResponse> failureResponses = new ArrayList<>();
 
         Optional<Store> storeById = storeServiceImpl.checkStoreById(request.getStoreId());
@@ -47,7 +47,8 @@ public class OrderServiceImpl implements OrderService {
             failureResponses.add(apiResponseMaker(NOT_FOUND, PAY_TYPE_NOT_FOUND.getMessage(), null));
 
         if (!failureResponses.isEmpty()) {
-            return ResponseEntity.status(BAD_REQUEST).body(Optional.of(failureResponses));
+//            return ResponseEntity.status(BAD_REQUEST).body(Optional.of(failureResponses));
+            return responseEntityMaker(BAD_REQUEST,WENT_WRONG.getMessage(),failureResponses);
         }
         Order savedOrder = orderRepo.save(buildOrder(request, storeById, payType));
         return responseEntityMaker(CREATED, ORDER_ADDED.getMessage(), savedOrder);

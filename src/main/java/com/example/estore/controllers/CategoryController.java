@@ -16,12 +16,12 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/addCategory")
-    public ResponseEntity<?> addCategory(@RequestBody CategoryReq request) {
+    public ResponseEntity<ApiResponse> addCategory(@RequestBody CategoryReq request) {
         return categoryService.addCategory(request);
     }
 
     @PostMapping("/editCategory/{id}")
-    public ResponseEntity<?> editCategory(@PathVariable String id, @RequestBody CategoryReq request) {
+    public ResponseEntity<ApiResponse> editCategory(@PathVariable String id, @RequestBody CategoryReq request) {
         return categoryService.editCategory(id,request);
     }
 
