@@ -7,7 +7,6 @@ import com.example.estore.payload.StoreReq;
 import com.example.estore.repos.StoreRepo;
 import com.example.estore.services.StoreService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,48 +32,47 @@ public class StoreServiceImpl implements StoreService {
     private final AttachmentService attachmentService;
 
 
-    public ResponseEntity<ApiResponse> createStore(StoreReq request) {
+    public ApiResponse<Store> createStore(StoreReq request) {
         Store newStore = new Store(request.getName());
         Store savedStore = storeRepo.save(newStore);
 
-        return ResponseEntity
-                .status(CREATED)
-                .body(apiResponseMaker(CREATED, STORE_CREATED.getMessage(), savedStore));
+        return apiResponseMaker(CREATED, STORE_CREATED.getMessage(), savedStore);
     }
 
 
-    public ResponseEntity<ApiResponse> uploadAttachment(MultipartFile file, String id) throws IOException {
+    public ApiResponse<Path> uploadAttachment(MultipartFile file, String id) throws IOException {
         Store foundStore = validateUUID(id) ? storeRepo.findById(UUID.fromString(id)).orElse(null) : null;
         if (foundStore != null) {
             HashMap<Attachment, Path> map = attachmentService.saveFile(file);
             Path path = map.values().iterator().next();
             foundStore.setAttachment(map.keySet().iterator().next());
             storeRepo.save(foundStore);
-            return responseEntityMaker(CREATED, ATTACHMENT_UPLOAD.getMessage(), path);
+            return apiResponseMaker(CREATED, ATTACHMENT_UPLOAD.getMessage(), path);
         }
-        return responseEntityMaker(NOT_FOUND, STORE_NOT_FOUND.getMessage(), null);
+        return apiResponseMaker(NOT_FOUND, STORE_NOT_FOUND.getMessage());
     }
 
     @Override
-    public ResponseEntity<ApiResponse> editStore(String id, StoreReq request) {
+    public ApiResponse<Store> editStore(String id, StoreReq request) {
         Store foundStore = validateUUID(id) ? storeRepo.findById(UUID.fromString(id)).orElse(null) : null;
-        if (foundStore!=null){
+        if (foundStore != null) {
             foundStore.setName(request.getName());
             Store savedStore = storeRepo.save(foundStore);
-            return responseEntityMaker(OK,STORE_UPDATED.getMessage(),savedStore.getName());
+            return apiResponseMaker(OK, STORE_UPDATED.getMessage(), savedStore);
         }
-        return responseEntityMaker(NOT_FOUND,STORE_NOT_FOUND.getMessage(),null);
+        return apiResponseMaker(NOT_FOUND, STORE_NOT_FOUND.getMessage());
     }
 
     @Override
-    public ResponseEntity<ApiResponse> getAllStores() {
+    public ApiResponse<List<Store>> getAllStores() {
         List<Store> storeList = storeRepo.findAll();
-        return responseEntityMaker(OK,
-                storeList.isEmpty() ? NO_STORES.getMessage() :TOTAL_STORES.getMessage()+storeList.size(),
+        return apiResponseMaker(
+                OK,
+                storeList.isEmpty() ? NO_STORES.getMessage() : TOTAL_STORES.getMessage() + storeList.size(),
                 storeList);
     }
 
-    public  Optional<Store> checkStoreById(String  uuid) {
+    public Optional<Store> checkStoreById(String uuid) {
         return validateUUID(uuid)
                 ? storeRepo.findById(fromString(uuid)) : Optional.empty();
     }

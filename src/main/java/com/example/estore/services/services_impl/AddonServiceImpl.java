@@ -6,9 +6,7 @@ import com.example.estore.payload.AddonReq;
 import com.example.estore.payload.ApiResponse;
 import com.example.estore.repos.AddonRepo;
 import com.example.estore.services.AddonService;
-import com.example.estore.util.Mapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +14,7 @@ import java.util.Optional;
 
 import static com.example.estore.enums.ApiResponseMessages.*;
 import static com.example.estore.util.CustomValidation.validateUUID;
+import static com.example.estore.util.Mapper.apiResponseMaker;
 import static com.example.estore.util.Mapper.responseEntityMaker;
 import static java.util.UUID.fromString;
 import static org.springframework.http.HttpStatus.*;
@@ -28,36 +27,36 @@ public class AddonServiceImpl implements AddonService {
     private final ProductServiceImpl productServiceImpl;
 
     @Override
-    public ResponseEntity<ApiResponse> addAddon(AddonReq request) {
+    public ApiResponse<Addon> addAddon(AddonReq request) {
         Optional<Product> productById = productServiceImpl.checkProductById(request.getProductUuid());
         if (productById.isPresent()) {
             Addon builtAddon = buildAddon(request, productById);
             Addon savedAddon = addonRepo.save(builtAddon);
-            return responseEntityMaker(CREATED, ADDON_ADDED.getMessage(), savedAddon);
+            return apiResponseMaker(CREATED, ADDON_ADDED.getMessage(), savedAddon);
         }
-        return responseEntityMaker(NOT_FOUND, ADDON_NOT_FOUND.getMessage(), null);
+        return apiResponseMaker(NOT_FOUND, ADDON_NOT_FOUND.getMessage(), null);
     }
 
     @Override
-    public ResponseEntity<ApiResponse> deleteAddon(String uuid) {
+    public ApiResponse<Addon> deleteAddon(String uuid) {
         Optional<Addon> addonById = checkAddonById(uuid);
         if (addonById.isPresent()) {
             Addon foundAddon = addonById.get();
             foundAddon.setDeleted(true);
             addonRepo.save(foundAddon);
-            return responseEntityMaker(OK, ADDON_DELETED.getMessage(), null);
+            return apiResponseMaker(OK, ADDON_DELETED.getMessage(), null);
         }
-        return responseEntityMaker(NOT_FOUND, ADDON_NOT_FOUND.getMessage(), null);
+        return apiResponseMaker(NOT_FOUND, ADDON_NOT_FOUND.getMessage(), null);
     }
 
     @Override
-    public ResponseEntity<ApiResponse> getAllAddons() {
+    public ApiResponse<List<Addon>> getAllAddons() {
         List<Addon> addons = addonRepo.findAll()
                 .stream()
                 .filter(addon -> !addon.isDeleted())
                 .toList();
 
-        return responseEntityMaker(OK,
+        return apiResponseMaker(OK,
                 addons.isEmpty() ? NO_ADDONS.getMessage() : TOTAL_ADDONS.getMessage() + addons.size(),
                 addons);
     }

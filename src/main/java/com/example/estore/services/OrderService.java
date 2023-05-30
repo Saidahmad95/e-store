@@ -1,16 +1,20 @@
 package com.example.estore.services;
 
+import com.example.estore.entities.Order;
+import com.example.estore.entities.OrderData;
 import com.example.estore.payload.ApiResponse;
 import com.example.estore.payload.OrderDataReq;
 import com.example.estore.payload.OrderReq;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 public interface OrderService {
-    ResponseEntity<ApiResponse> addOrder(OrderReq request);
+    ApiResponse<Order> addOrder(OrderReq request);
 
-    ResponseEntity<ApiResponse> addOrderData(OrderDataReq request);
+    ApiResponse<OrderData> addOrderData(OrderDataReq request);
 
-    ResponseEntity<ApiResponse> getAllOrders();
+    ApiResponse<List<Order>> getAllOrders();
 
-    ResponseEntity<ApiResponse> getAllOrderData();
+    ApiResponse<List<OrderData>> getAllOrderData();
 }

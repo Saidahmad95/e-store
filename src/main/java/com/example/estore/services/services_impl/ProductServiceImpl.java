@@ -9,7 +9,6 @@ import com.example.estore.repos.CategoryRepo;
 import com.example.estore.repos.ProductRepo;
 import com.example.estore.services.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +16,7 @@ import java.util.Optional;
 
 import static com.example.estore.enums.ApiResponseMessages.*;
 import static com.example.estore.util.CustomValidation.*;
-import static com.example.estore.util.Mapper.responseEntityMaker;
-import static com.example.estore.util.Mapper.updateProduct;
+import static com.example.estore.util.Mapper.*;
 import static java.util.UUID.*;
 import static org.springframework.http.HttpStatus.*;
 
@@ -29,31 +27,29 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
     private final StoreServiceImpl storeServiceImpl;
+    private final CategoryServiceImpl categoryService;
 
     @Override
-    public ResponseEntity<ApiResponse> addProduct(ProductReq request) {
-        //TODO Should change after creation category implementations
-//        Optional<Category> categoryById = checkCategoryById(request.getCategoryId());
-        Optional<Category> categoryById = Optional.of(new Category());
+    public ApiResponse<Product> addProduct(ProductReq request) {
+
+        Optional<Category> categoryById = categoryService.checkCategoryById(request.getCategoryId());
         Optional<Store> storeById = storeServiceImpl.checkStoreById(request.getStoreId());
 
         if (categoryById.isPresent() && storeById.isPresent()) {
             Product builtProduct = buildProduct(request, categoryById, storeById);
             Product savedProduct = productRepo.save(builtProduct);
 
-            return responseEntityMaker(CREATED, PRODUCT_ADDED.getMessage(), savedProduct);
+            return apiResponseMaker(CREATED, PRODUCT_ADDED.getMessage(), savedProduct);
         }
         return buildApiResponseInFail(categoryById, storeById);
     }
 
     @Override
-    public ResponseEntity<ApiResponse> editProduct(ProductReq request, String id) {
+    public ApiResponse<Product> editProduct(ProductReq request, String id) {
         Optional<Product> productById = checkProductById(id);
         if (productById.isPresent()) {
             Product foundProduct = productById.get();
-            //TODO Change after Category implementation
-//            Optional<Category> categoryById = checkCategoryById(request.getCategoryId());
-            Optional<Category> categoryById = Optional.of(new Category());
+            Optional<Category> categoryById = categoryService.checkCategoryById(request.getCategoryId());
             Optional<Store> storeById = storeServiceImpl.checkStoreById(request.getStoreId());
 
             if (categoryById.isPresent() && storeById.isPresent()) {
@@ -64,34 +60,34 @@ public class ProductServiceImpl implements ProductService {
                         categoryById.get());
 
                 Product savedProduct = productRepo.save(updatedProduct);
-                return responseEntityMaker(OK, PRODUCT_EDITED.getMessage(), savedProduct);
+                return apiResponseMaker(OK, PRODUCT_EDITED.getMessage(), savedProduct);
             }
             return buildApiResponseInFail(categoryById, storeById);
         }
-        return responseEntityMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage(), null);
+        return apiResponseMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage(), null);
     }
 
     @Override
-    public ResponseEntity<ApiResponse> deleteProduct(String uuid) {
+    public ApiResponse<Product> deleteProduct(String uuid) {
         Optional<Product> productById = checkProductById(uuid);
         if (productById.isPresent()) {
 //            productRepo.deleteById(fromString(uuid));
             Product foundProduct = productById.get();
             foundProduct.setDeleted(true);
             productRepo.save(foundProduct);
-            return responseEntityMaker(OK, PRODUCT_DELETED.getMessage(), null);
+            return apiResponseMaker(OK, PRODUCT_DELETED.getMessage());
         }
-        return responseEntityMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage(), null);
+        return apiResponseMaker(NOT_FOUND, PRODUCT_NOT_FOUND.getMessage());
     }
 
     @Override
-    public ResponseEntity<ApiResponse> getAllProducts() {
+    public ApiResponse<List<Product>> getAllProducts() {
         List<Product> products = productRepo.findAll()
                 .stream()
                 .filter(product -> !product.isDeleted())
                 .toList();
 
-        return responseEntityMaker(OK,
+        return apiResponseMaker(OK,
                 products.isEmpty() ? NO_PRODUCTS.getMessage() : TOTAL_PRODUCTS.getMessage() + products.size(),
                 products);
     }
@@ -118,17 +114,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private ResponseEntity<ApiResponse> buildApiResponseInFail(Optional<Category> categoryById,
-                                                               Optional<Store> storeById) {
+    private ApiResponse buildApiResponseInFail(Optional<Category> categoryById,
+                                               Optional<Store> storeById) {
         if (categoryById.isEmpty()) {
-            return responseEntityMaker(NOT_FOUND, CATEGORY_NOT_FOUND.getMessage(), null);
+            return apiResponseMaker(NOT_FOUND, CATEGORY_NOT_FOUND.getMessage());
         } else if (storeById.isEmpty()) {
-            return responseEntityMaker(NOT_FOUND, STORE_NOT_FOUND.getMessage(), null);
+            return apiResponseMaker(NOT_FOUND, STORE_NOT_FOUND.getMessage());
         } else {
-            return responseEntityMaker(
+            return apiResponseMaker(
                     NOT_FOUND,
-                    CATEGORY_NOT_FOUND.getMessage().concat("\n").concat(STORE_NOT_FOUND.getMessage()),
-                    null);
+                    CATEGORY_NOT_FOUND.getMessage().concat("\n").concat(STORE_NOT_FOUND.getMessage()));
         }
     }
 

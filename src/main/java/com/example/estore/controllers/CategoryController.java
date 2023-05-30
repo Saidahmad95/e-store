@@ -1,5 +1,6 @@
 package com.example.estore.controllers;
 
+import com.example.estore.entities.Category;
 import com.example.estore.payload.ApiResponse;
 import com.example.estore.payload.CategoryReq;
 import com.example.estore.payload.OrderReq;
@@ -16,20 +17,29 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/addCategory")
-    public ResponseEntity<ApiResponse> addCategory(@RequestBody CategoryReq request) {
-        return categoryService.addCategory(request);
+    public ResponseEntity<ApiResponse<Category>> addCategory(@RequestBody CategoryReq request) {
+        ApiResponse<Category> categoryApiResponse = categoryService.addCategory(request);
+        return ResponseEntity
+                .status(categoryApiResponse.getHttpStatus())
+                .body(categoryApiResponse);
     }
 
     @PostMapping("/editCategory/{id}")
-    public ResponseEntity<ApiResponse> editCategory(@PathVariable String id, @RequestBody CategoryReq request) {
-        return categoryService.editCategory(id,request);
+    public ResponseEntity<ApiResponse<Category>> editCategory(@PathVariable String id,
+                                                              @RequestBody CategoryReq request) {
+        ApiResponse<Category> categoryApiResponse = categoryService.editCategory(id, request);
+        return ResponseEntity
+                .status(categoryApiResponse.getHttpStatus())
+                .body(categoryApiResponse);
     }
 
     @DeleteMapping("/deleteCategory/{id}")
-    public ResponseEntity<ApiResponse>deleteCategory(@PathVariable String id){
-        return categoryService.deleteCategory(id);
+    public ResponseEntity<ApiResponse<Category>> deleteCategory(@PathVariable String id) {
+        ApiResponse<Category> categoryApiResponse = categoryService.deleteCategory(id);
+        return ResponseEntity
+                .status(categoryApiResponse.getHttpStatus())
+                .body(categoryApiResponse);
     }
-
 
 
 }
